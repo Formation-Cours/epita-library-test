@@ -85,11 +85,17 @@ public class AuthorServiceImpl implements IAuthorService {
   }
 
   private void validateAuthor(Author author) {
-    if (author.getName() == null || author.getName().trim().isEmpty()) {
+    if (author.getName() == null ||
+        author.getName().isBlank()) {
       throw new IllegalArgumentException("Le nom de l'auteur ne peut pas être vide");
     }
 
-    if (author.getEmail() != null && existsByEmail(author.getEmail())) {
+    if (author.getEmail() == null ||
+        author.getEmail().isBlank()) {
+      throw new IllegalArgumentException("L'email doit être renseigné");
+    }
+
+    if (existsByEmail(author.getEmail())) {
       throw new IllegalArgumentException("Un auteur avec cet email existe déjà");
     }
   }

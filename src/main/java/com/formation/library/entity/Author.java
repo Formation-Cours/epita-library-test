@@ -117,7 +117,8 @@ public class Author {
     if (!(o instanceof Author))
       return false;
     Author author = (Author) o;
-    return id != null && id.equals(author.id);
+    return id != null &&
+        id.equals(author.id);
   }
 
   @Override

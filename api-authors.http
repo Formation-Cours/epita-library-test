@@ -50,7 +50,7 @@ GET {{baseUrl}}/api/authors/email/victor.hugo@example.com HTTP/1.1
 
 ### 6. Search authors by name
 
-GET {{baseUrl}}/api/authors/search?name=Victor HTTP/1.1
+GET {{baseUrl}}/api/authors/search?name=victor HTTP/1.1
 
 
 ### 7. Get authors by birth date range

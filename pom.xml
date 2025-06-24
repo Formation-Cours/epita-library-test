@@ -78,6 +78,13 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.13</version>
+				<configuration>
+					<excludes>
+						<exclude>com/formation/library/mapper/**</exclude>
+						<exclude>com/formation/library/exception/**</exclude>
+						<exclude>com/formation/library/dto/**</exclude>
+					</excludes>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
