@@ -1,8 +1,10 @@
 package com.formation.library.service;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +57,7 @@ public class AuthorServiceImpl implements IAuthorService {
   }
 
   @Override
-  public List<Author> findByGenre(String genre) {
+  public List<Author> findByGenre(@NonNull String genre) {
     return authorRepository.findByBooksGenre(genre);
   }
 
