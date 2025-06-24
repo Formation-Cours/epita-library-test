@@ -150,6 +150,6 @@ public class BookServiceImpl implements IBookService {
 
   private boolean isValidIsbn(String isbn) {
     // Validation simplifiée pour l'exemple
-    return isbn != null && (isbn.length() == 10 || isbn.length() == 13);
+    return isbn.length() == 10 || isbn.length() == 13;
   }
 }
