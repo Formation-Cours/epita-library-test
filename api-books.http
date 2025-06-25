@@ -1,6 +1,6 @@
 ### Configuration des variables
 
-@baseUrl = http://localhost:8080
+@baseUrl = https://library.olprog-formation.fr
 @contentType = application/json
 
 
@@ -116,7 +116,7 @@ GET {{baseUrl}}/api/books/status/BORROWED HTTP/1.1
 
 ### 10. Get books by genre
 
-GET {{baseUrl}}/api/books/genre/Historical&20Fiction HTTP/1.1
+GET {{baseUrl}}/api/books/genre/Historical%20Fiction HTTP/1.1
 
 
 ### 11. Get books by author ID

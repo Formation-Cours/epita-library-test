@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres
+    container_name: db
+    # ports:
+    #   - 5432:5432
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-events}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      TZ: "Europe/Paris"
+    volumes:
+      - db:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - events-network
+
+  back:
+    image: library
+    container_name: library
+    build:
+      context: .
+      # dockerfile: Dockerfile
+    ports:
+      - "${BACK_PORT:-2548}:8080"
+    environment:
+      POSTGRES_URL: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: "${POSTGRES_DB:-events}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      SHOW_SQL: false
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - events-network
+
+volumes:
+  db:
+
+networks:
+  events-network:

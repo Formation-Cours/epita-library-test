@@ -1,6 +1,6 @@
 ### Configuration des variables
 
-@baseUrl = http://localhost:8080
+@baseUrl = https://library.olprog-formation.fr
 @contentType = application/json
 
 

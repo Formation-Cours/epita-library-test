@@ -16,6 +16,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import com.formation.library.dto.AuthorWithBooksDTO;
 
@@ -27,6 +29,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.formation.library.dto.AuthorDTO;
@@ -39,161 +42,162 @@ import com.formation.library.service.IAuthorService;
 @DisplayName("Tests du controlleur Author")
 public class AuthorControllerTest {
 
-  @Autowired
-  private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-  @MockitoBean
-  private IAuthorService authorService;
+    @MockitoBean
+    private IAuthorService authorService;
 
-  @MockitoBean
-  private DTOMapper dtoMapper;
+    @MockitoBean
+    private DTOMapper dtoMapper;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-  private Author author1;
-  private Author author2;
+    private Author author1;
+    private Author author2;
 
-  private AuthorDTO author1DTO;
-  private AuthorDTO author2DTO;
+    private AuthorDTO author1DTO;
+    private AuthorDTO author2DTO;
 
-  @BeforeEach
-  void setUp() {
-    author1 = new Author("Victor Hugo", "victor.hugo@example.com");
-    author1.setId(1L);
-    author1.setBirthDate(LocalDate.of(1802, 2, 26));
-    author1.setBiography("Écrivain français du XIXe siècle");
+    @BeforeEach
+    void setUp() {
+        author1 = new Author("Victor Hugo", "victor.hugo@example.com");
+        author1.setId(1L);
+        author1.setBirthDate(LocalDate.of(1802, 2, 26));
+        author1.setBiography("Écrivain français du XIXe siècle");
 
-    author2 = new Author("Émile Zola", "emile.zola@example.com");
-    author2.setId(2L);
-    author2.setBirthDate(LocalDate.of(1840, 4, 2));
-    author2.setBiography("Écrivain français, chef de file du naturalisme");
+        author2 = new Author("Émile Zola", "emile.zola@example.com");
+        author2.setId(2L);
+        author2.setBirthDate(LocalDate.of(1840, 4, 2));
+        author2.setBiography("Écrivain français, chef de file du naturalisme");
 
-    author1DTO = new AuthorDTO(author1.getId(), author1.getName(), author1.getEmail(), author1.getBirthDate(),
-        author1.getBiography());
+        author1DTO = new AuthorDTO(author1.getId(), author1.getName(), author1.getEmail(), author1.getBirthDate(),
+                author1.getBiography());
 
-    author2DTO = new AuthorDTO(author2.getId(), author2.getName(), author2.getEmail(), author2.getBirthDate(),
-        author2.getBiography());
-  }
+        author2DTO = new AuthorDTO(author2.getId(), author2.getName(), author2.getEmail(), author2.getBirthDate(),
+                author2.getBiography());
 
-  @Test
-  void shouldCreateValidAuthor() throws Exception {
+    }
 
-    when(authorService.save(any(Author.class))).thenReturn(author1);
-    when(dtoMapper.toAuthorDTO(author1)).thenReturn(author1DTO);
+    @Test
+    void shouldCreateValidAuthor() throws Exception {
 
-    mockMvc.perform(
-        post("/api/authors")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(author1)))
-        .andDo(print())
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.id").value(1))
-        .andExpect(jsonPath("$.name").value("Victor Hugo"))
-        .andExpect(jsonPath("$.email").value("victor.hugo@example.com"))
-        .andExpect(jsonPath("$.birthDate").value("26/02/1802"));
+        when(authorService.save(any(Author.class))).thenReturn(author1);
+        when(dtoMapper.toAuthorDTO(author1)).thenReturn(author1DTO);
 
-    verify(authorService).save(any(Author.class));
-  }
+        mockMvc.perform(
+                post("/api/authors")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(author1)))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Victor Hugo"))
+                .andExpect(jsonPath("$.email").value("victor.hugo@example.com"))
+                .andExpect(jsonPath("$.birthDate").value("26/02/1802"));
 
-  @Test
-  void shouldRejectAuthorWithNullName() throws Exception {
-    Author invalidAuthor = new Author(null, "victor.hugo@example.com");
+        verify(authorService).save(any(Author.class));
+    }
 
-    mockMvc.perform(
-        post("/api/authors")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(invalidAuthor)))
-        .andDo(print())
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.status").value("400"))
-        .andExpect(jsonPath("$.error").value("Validation Failed"))
-        .andExpect(jsonPath("$.errors.name").value("Le nom doit être renseigné"));
+    @Test
+    void shouldRejectAuthorWithNullName() throws Exception {
+        Author invalidAuthor = new Author(null, "victor.hugo@example.com");
 
-    verifyNoInteractions(authorService);
-  }
+        mockMvc.perform(
+                post("/api/authors")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidAuthor)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value("400"))
+                .andExpect(jsonPath("$.error").value("Validation Failed"))
+                .andExpect(jsonPath("$.errors.name").value("Le nom doit être renseigné"));
 
-  @Test
-  void shouldGetAuthorID() throws Exception {
+        verifyNoInteractions(authorService);
+    }
 
-    AuthorWithBooksDTO dto = new AuthorWithBooksDTO(
-        author1.getId(),
-        author1.getName(),
-        author1.getEmail(),
-        author1.getBirthDate(),
-        author1.getBiography(),
-        List.of());
+    @Test
+    void shouldGetAuthorID() throws Exception {
 
-    when(authorService.findById(1L)).thenReturn(author1);
-    when(dtoMapper.toAuthorWithBooksDTO(author1)).thenReturn(dto);
+        AuthorWithBooksDTO dto = new AuthorWithBooksDTO(
+                author1.getId(),
+                author1.getName(),
+                author1.getEmail(),
+                author1.getBirthDate(),
+                author1.getBiography(),
+                List.of());
 
-    mockMvc.perform(
-        get("/api/authors/1")
-            .contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(1))
-        .andExpect(jsonPath("$.name").value("Victor Hugo"))
-        .andExpect(jsonPath("$.email").value("victor.hugo@example.com"))
-        .andExpect(jsonPath("$.birthDate").value("1802-02-26"));
+        when(authorService.findById(1L)).thenReturn(author1);
+        when(dtoMapper.toAuthorWithBooksDTO(author1)).thenReturn(dto);
 
-    verify(authorService).findById(1L);
-  }
+        mockMvc.perform(
+                get("/api/authors/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Victor Hugo"))
+                .andExpect(jsonPath("$.email").value("victor.hugo@example.com"))
+                .andExpect(jsonPath("$.birthDate").value("1802-02-26"));
 
-  @Test
-  void shouldReturn404ForNonExistingAuthor() throws Exception {
+        verify(authorService).findById(1L);
+    }
 
-    when(authorService.findById(999L)).thenThrow(new AuthorNotFoundException(999L));
+    @Test
+    void shouldReturn404ForNonExistingAuthor() throws Exception {
 
-    mockMvc.perform(
-        get("/api/authors/999")
-            .contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.status").value("404"))
-        .andExpect(jsonPath("$.message").value("Auteur non trouvé avec l'ID: 999"));
+        when(authorService.findById(999L)).thenThrow(new AuthorNotFoundException(999L));
 
-    verify(authorService).findById(999L);
-  }
+        mockMvc.perform(
+                get("/api/authors/999")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value("404"))
+                .andExpect(jsonPath("$.message").value("Auteur non trouvé avec l'ID: 999"));
 
-  @Test
-  void shouldGetAllAuthors() throws Exception {
-    List<Author> authors = List.of(author1, author2);
-    List<AuthorDTO> authorsDTO = List.of(author1DTO, author2DTO);
+        verify(authorService).findById(999L);
+    }
 
-    when(authorService.findAll()).thenReturn(authors);
-    when(dtoMapper.toAuthorDTOList(authors)).thenReturn(authorsDTO);
+    @Test
+    void shouldGetAllAuthors() throws Exception {
+        List<Author> authors = List.of(author1, author2);
+        List<AuthorDTO> authorsDTO = List.of(author1DTO, author2DTO);
 
-    mockMvc.perform(
-        get("/api/authors")
-            .contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(2)))
-        .andExpect(jsonPath("$[0].name").value("Victor Hugo"))
-        .andExpect(jsonPath("$[1].name").value("Émile Zola"));
+        when(authorService.findAll()).thenReturn(authors);
+        when(dtoMapper.toAuthorDTOList(authors)).thenReturn(authorsDTO);
 
-    verify(authorService).findAll();
-    verifyNoMoreInteractions(authorService);
-  }
+        mockMvc.perform(
+                get("/api/authors")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].name").value("Victor Hugo"))
+                .andExpect(jsonPath("$[1].name").value("Émile Zola"));
 
-  @Test
-  void shouldSearchAuthors() throws Exception {
-    List<Author> authors = List.of(author1);
-    List<AuthorDTO> authorsDTO = List.of(author1DTO);
+        verify(authorService).findAll();
+        verifyNoMoreInteractions(authorService);
+    }
 
-    when(authorService.findByName("Victor")).thenReturn(authors);
-    when(dtoMapper.toAuthorDTOList(authors)).thenReturn(authorsDTO);
+    @Test
+    void shouldSearchAuthors() throws Exception {
+        List<Author> authors = List.of(author1);
+        List<AuthorDTO> authorsDTO = List.of(author1DTO);
 
-    mockMvc.perform(
-        get("/api/authors/search")
-            .contentType(MediaType.APPLICATION_JSON)
-            .param("name", "Victor"))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0].name").value("Victor Hugo"));
+        when(authorService.findByName("Victor")).thenReturn(authors);
+        when(dtoMapper.toAuthorDTOList(authors)).thenReturn(authorsDTO);
 
-    verify(authorService).findByName("Victor");
-  }
+        mockMvc.perform(
+                get("/api/authors/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("name", "Victor"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].name").value("Victor Hugo"));
+
+        verify(authorService).findByName("Victor");
+    }
 }

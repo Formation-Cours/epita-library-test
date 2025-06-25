@@ -1,24 +1,27 @@
+server:
+  port: "${SERVER_PORT:8080}"
 spring:
   application:
     name: library
+
   datasource:
-    url: jdbc:h2:mem:library
-    driverClassName: org.h2.Driver
-    username: sa
-    password: password
+    url: "jdbc:postgresql://${POSTGRES_URL:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:events}"
+    driverClassName: org.postgresql.Driver
+    username: "${POSTGRES_USER}"
+    password: "${POSTGRES_PASSWORD}"
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create-drop
-    show-sql: true
+      ddl-auto: update
+    show-sql: "${SHOW_SQL:false}"
     properties:
       hibernate:
         format_sql: true
 
   h2:
     console:
-      enabled: true
+      enabled: false
       path: /h2-console
 
 logging:
