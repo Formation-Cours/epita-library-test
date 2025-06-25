@@ -3,6 +3,7 @@ package com.formation.library.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
@@ -17,7 +18,7 @@ public class Author {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @NotBlank(message = "Le nom ne peut pas être vide")
+  @NotNull(message = "Le nom doit être renseigné")
   @Size(min = 2, max = 100, message = "Le nom doit contenir entre 2 et 100 caractères")
   @Column(nullable = false)
   private String name;
